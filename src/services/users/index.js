@@ -1,15 +1,48 @@
 import express from "express";
+import { users } from "../../data/users.js";
 import { User, Article } from "../../db/models/index.js";
+import { Op } from "sequelize";
 
 const router = express.Router();
 
 router
   .route("/")
   .get(async (req, res, next) => {
+    let LastNameExists = true;
+
+    let obj = {
+      name: "Tetitana",
+      ...(LastNameExists && { lastName: "Yaremko" }),
+    };
+
     try {
       const users = await User.findAll({
         //  attributes: ["id", "name", "email"],
-        attributes: { exclude: ["age", "country"] },
+        where: {
+          ...(req.query.search && {
+            [Op.or]: [
+              {
+                name: { [Op.iLike]: `%${req.query.search}%` },
+              },
+              {
+                email: { [Op.iLike]: `%${req.query.search}%` },
+              },
+              {
+                lastName: { [Op.iLike]: `%${req.query.search}%` },
+              },
+            ],
+          }),
+
+          ...(req.query.age && {
+            age: {
+              [Op.between]: req.query.age.split(","),
+            },
+          }),
+        },
+
+        order: [["age", "DESC"]],
+
+        // attributes: { exclude: ["age", "country"] },
         include: [
           { model: Article, attributes: { exclude: ["readTimeValue"] } },
         ],
@@ -30,6 +63,16 @@ router
       next(e);
     }
   });
+
+router.route("/bulk").post(async (req, res, next) => {
+  try {
+    const data = await User.bulkCreate(users);
+    res.send(data);
+  } catch (error) {
+    console.log(e);
+    next(e);
+  }
+});
 
 router
   .route("/:id")
