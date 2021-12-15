@@ -19,10 +19,17 @@ router
               {
                 content: { [Op.iLike]: `%${req.query.search}%` },
               },
+              //Option 1
+              {
+                "$user.name$": {
+                  [Op.iLike]: "%" + req.query.search + "%",
+                },
+              },
+              //Option 2
               // {
-              //   [Sequelize.col("user.lastName")]: {
-              //     [Op.iLike]: `%${req.query.search}%`,
-              //   },
+              //   name: Sequelize.where(Sequelize.col(`"user.name"`), {
+              //     [Op.iLike]: "%" + req.query.search + "%",
+              //   }),
               // },
             ],
           }),
