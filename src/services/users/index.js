@@ -1,5 +1,5 @@
 import express from "express";
-import { User } from "../../db/models/index.js";
+import { User, Article } from "../../db/models/index.js";
 
 const router = express.Router();
 
@@ -9,7 +9,10 @@ router
     try {
       const users = await User.findAll({
         //  attributes: ["id", "name", "email"],
-        //  attributes: { exclude: ["age", "country"] },
+        attributes: { exclude: ["age", "country"] },
+        include: [
+          { model: Article, attributes: { exclude: ["readTimeValue"] } },
+        ],
       });
       res.send(users);
     } catch (e) {
