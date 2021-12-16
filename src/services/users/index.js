@@ -8,13 +8,6 @@ const router = express.Router();
 router
   .route("/")
   .get(async (req, res, next) => {
-    let LastNameExists = true;
-
-    let obj = {
-      name: "Tetitana",
-      ...(LastNameExists && { lastName: "Yaremko" }),
-    };
-
     try {
       const users = await User.findAll({
         //  attributes: ["id", "name", "email"],
@@ -32,21 +25,23 @@ router
               },
             ],
           }),
-
           ...(req.query.age && {
             age: {
-              [Op.between]: req.query.age.split(","),
+              [Op.between]: req.query.age.split(","), // filters by age range
             },
           }),
         },
-
-        order: [["age", "DESC"]],
-
+        // order: [["age", "DESC"]],
         // attributes: { exclude: ["age", "country"] },
         include: [
           { model: Article, attributes: { exclude: ["readTimeValue"] } },
         ],
+
+        //Pagination
+        limit: req.query.limit, // number of records per page
+        offset: parseInt(req.query.limit * req.query.page), // number f records skipped from 0
       });
+
       res.send(users);
     } catch (e) {
       console.log(e);
@@ -69,8 +64,8 @@ router.route("/bulk").post(async (req, res, next) => {
     const data = await User.bulkCreate(users);
     res.send(data);
   } catch (error) {
-    console.log(e);
-    next(e);
+    console.log(error);
+    next(error);
   }
 });
 

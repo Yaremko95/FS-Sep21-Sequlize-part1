@@ -47,4 +47,18 @@ export const users = [
     age: 38,
     country: "Italy",
   },
+  {
+    name: "Hasan",
+    lastName: "Satar",
+    email: "hasan@gmail.com",
+    age: 20,
+    country: "Italy",
+  },
+  {
+    name: "Mansi",
+    lastName: "Ganar",
+    email: "mansi@gmail.com",
+    age: 20,
+    country: "Italy",
+  },
 ];

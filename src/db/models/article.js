@@ -18,10 +18,7 @@ const Article = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    category: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+
     readTimeValue: {
       type: DataTypes.INTEGER,
       allowNull: false,
