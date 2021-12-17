@@ -18,7 +18,6 @@ const Article = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-
     readTimeValue: {
       type: DataTypes.INTEGER,
       allowNull: false,

@@ -2,6 +2,7 @@ import express from "express";
 import { articles } from "../../data/articles.js";
 import { Article, User, Review, Category } from "../../db/models/index.js";
 import { Op } from "sequelize";
+import { categories } from "../../data/categories.js";
 const router = express.Router();
 
 router
@@ -25,12 +26,7 @@ router
 
 router.route("/bulk").post(async (req, res, next) => {
   try {
-    const data = await Category.bulkCreate([
-      { name: "SQL" },
-      { name: "React.js" },
-      { name: "Databases" },
-      { name: "Frontend" },
-    ]);
+    const data = await Category.bulkCreate(categories);
 
     res.send(data);
   } catch (error) {

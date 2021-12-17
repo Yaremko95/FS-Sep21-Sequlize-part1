@@ -20,7 +20,7 @@ router
           {
             model: Category,
             through: { attributes: [] }, // include category without join table
-            attributes: { exclude: ["createdAt", "updatedAt"] }, //exclude attributes from included Category table
+            // attributes: { exclude: ["createdAt", "updatedAt"] }, //exclude attributes from included Category table
 
             //filters by Category
             where: {

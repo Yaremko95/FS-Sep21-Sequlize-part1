@@ -1,7 +1,7 @@
 import express from "express";
 import { users } from "../../data/users.js";
 import { User, Article } from "../../db/models/index.js";
-import { Op } from "sequelize";
+import { Op, fn, col } from "sequelize";
 
 const router = express.Router();
 
@@ -37,9 +37,9 @@ router
           { model: Article, attributes: { exclude: ["readTimeValue"] } },
         ],
 
-        //Pagination
-        limit: req.query.limit, // number of records per page
-        offset: parseInt(req.query.limit * req.query.page), // number f records skipped from 0
+        // //Pagination
+        // limit: req.query.limit, // number of records per page
+        // offset: parseInt(req.query.limit * req.query.page), // number f records skipped from 0
       });
 
       res.send(users);
@@ -69,6 +69,47 @@ router.route("/bulk").post(async (req, res, next) => {
   }
 });
 
+router.route("/stats").get(async (req, res, next) => {
+  try {
+    //counts all the users in db
+    // select count(id) from users;
+
+    const totalUsers = await User.count();
+
+    //select count(id) from users where country='Italy';
+    const totalInItaly = await User.count({ where: { country: "Italy" } });
+
+    // select country, count(id) as total from users group by country order by total DESC;
+
+    const groupedBuCountry = await User.findAll({
+      attributes: ["country", [fn("COUNT", col("id")), "total"]],
+      group: "country",
+      order: [[col("total"), "DESC"]],
+    });
+
+    // select max(age) from users
+    const maxAge = await User.max("age");
+
+    const minAge = await User.min("age");
+
+    // select country, avg(age) as avarage from users group by country
+    const avgAgeByCountry = await User.findAll({
+      attributes: ["country", [fn("AVG", col("age")), "avgAge"]],
+      group: "country",
+    });
+
+    // select country, min(age) as minAge from users group by country
+    const minAgeByCountry = await User.findAll({
+      attributes: ["country", [fn("min", col("age")), "youngest"]],
+      group: "country",
+    });
+
+    res.send({ maxAge, minAge, avgAgeByCountry, minAgeByCountry });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 router
   .route("/:id")
   .get(async (req, res, next) => {
